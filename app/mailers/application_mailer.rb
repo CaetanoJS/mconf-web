@@ -13,6 +13,7 @@ class ApplicationMailer < BaseMailer
     I18n.with_locale(site_locale) do
       subject = "#{I18n.t("application_mailer.feedback_email.subject")}: #{subject}"
       @text = body
+      @user = User.find_by(email: email)
       @email = email
       create_email(Site.current.smtp_receiver, email, subject)
     end

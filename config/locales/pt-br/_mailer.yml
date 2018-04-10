@@ -2,7 +2,7 @@
 pt-br:
   application_mailer:
     feedback_email:
-      content: "<b>%{email}</b> enviou o seguinte feedback:"
+      content: "<b>%{name}</b> (%{email}) enviou o seguinte feedback:"
       subject: "Feedback"
   admin_mailer:
     new_user_waiting_for_approval:
