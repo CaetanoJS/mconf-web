@@ -7,7 +7,21 @@
 require "spec_helper"
 
 describe ApplicationMailer do
+
+  shared_examples 'footer e-mail' do
+    it { mail_content(mail).should match(I18n.t('layouts.mailers.e_mail')) }
+    it { mail_content(mail).should match(I18n.t('layouts.mailers.footer_title')) }
+    it { mail_content(mail).should match(I18n.t('layouts.mailers.adress')) }
+    it { mail_content(mail).should match(Regexp.escape(I18n.t('layouts.mailers.phone'))) }
+    it { mail_content(mail).should match(I18n.t('layouts.mailers.unsubscribe')) }
+    it { mail_content(mail).should match(Regexp.escape(I18n.t('layouts.mailers.question'))) }
+    it ("Sets Linkdin image") { mail_content(mail).should match('assets/mailer/linkedin.png') }
+    it ("Sets Medium image") { mail_content(mail).should match('assets/mailer/medium.png') }
+    it ("Sets Facebook image") { mail_content(mail).should match('assets/mailer/facebook.png') }
+  end
+
   describe '.feedback_email' do
+    it ("Sets header logo image") { mail_content(mail).should match('assets/mailer/mconf_live.png') }
     let(:user) { FactoryGirl.create(:user) }
     let(:subject) { Forgery::LoremIpsum.characters 30 }
     let(:message) { Forgery::LoremIpsum.characters 140 }
@@ -19,6 +33,7 @@ describe ApplicationMailer do
         text = "#{I18n.t('application_mailer.feedback_email.subject')}: #{subject}"
         mail.subject.should eql(text)
       }
+
       it("sets 'from'") { mail.from.should eql([Site.current.smtp_sender]) }
       it("sets 'headers'") { mail.headers.should eql({}) }
       it("sets 'reply_to'") { mail.reply_to.should eql([user.email]) }
@@ -33,7 +48,7 @@ describe ApplicationMailer do
         user.update_attribute(:locale, "en")
       }
       it {
-        content = I18n.t('application_mailer.feedback_email.content', :email => user.email, :locale => "pt-br")
+        content = I18n.t('application_mailer.feedback_email.content', :name => user.full_name, :email => user.email, :locale => "pt-br")
         mail_content(mail).should match(Regexp.escape(content))
       }
     end
@@ -45,10 +60,11 @@ describe ApplicationMailer do
         user.update_attribute(:locale, "en")
       }
       it {
-        content = I18n.t('application_mailer.feedback_email.content', :email => user.email, :locale => "pt-br")
+        content = I18n.t('application_mailer.feedback_email.content', :name => user.full_name, :email => user.email, :locale => "pt-br")
         mail_content(mail).should match(Regexp.escape(content))
       }
     end
+    it_behaves_like 'footer e-mail'
   end
 
   context "calls the error handler on exceptions" do
